@@ -51,6 +51,7 @@ module.exports = {
 
     return res.json(user);
   },
+  
   async destroy(req, res) {
     // Remocao
     const r = await UserModel.findOneAndRemove(req.params.id);

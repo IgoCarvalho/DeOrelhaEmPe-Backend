@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization;
 
     jwt.verify(token, config.secretKey, (erro, decoded) => {
-        if(erro) return res.status(401).send({'erro': 'token invalido'});
+        if(erro) return res.status(401).send({'erro': erro});
 
         req.userId = decoded.id;
 

@@ -10,7 +10,7 @@ const UserModel = mongoose.model('User');
 const generateToken = (id) => {
   const token = jwt.sign({
     id: id
-  }, config.secretKey);
+  }, config.secretKey, {expiresIn: 25});
 
   return token;
 }
@@ -66,21 +66,17 @@ module.exports = {
       const user = await UserModel.findOne({ email });
 
       if (!user)
-        return res.status(400).send({
-          'erro': 'usuaro invalido'
-        });
+        return res.status(400).send({ 'erro': 'usuaro invalido' });
 
       if (!await bcrypt.compare(password, user.password))
-        res.status(400).send({
-          'erro': 'senha invalida'
-        });
+        return res.status(400).send({ 'erro': 'senha invalida' });
 
       user.password = undefined;
 
       return res.send({
         user,
         token: await generateToken(user.id)
-      })
+      });
     } catch (ex) {
       return res.status(500).send({
         'erro': ex
@@ -103,7 +99,7 @@ module.exports = {
       const user = await UserModel.create(newUser);
       user.password = undefined;
 
-      return res.status(201).json({
+      return res.status(201).send({
         user,
         token: await generateToken(user.id)
       });

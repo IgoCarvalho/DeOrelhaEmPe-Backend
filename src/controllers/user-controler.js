@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config/properties');
 
 
-require('../models/UserModel');
+require('../models/user-model');
 const UserModel = mongoose.model('User');
 
 const generateToken = (id) => {
@@ -66,21 +66,26 @@ module.exports = {
       const user = await UserModel.findOne({ email });
 
       if (!user)
-        return res.status(400).send({ 'erro': 'usuaro invalido' });
+        return res.status(404).send({ message: 'Usuário ou senha inválidos' });
 
       if (!await bcrypt.compare(password, user.password))
-        return res.status(400).send({ 'erro': 'senha invalida' });
+        return res.status(404).send({ message: 'Usuário ou senha inválidos' });
 
       user.password = undefined;
 
       return res.send({
-        user,
-        token: await generateToken(user.id)
+        token: await generateToken(user.id),
+        user: {
+          name: user.name,
+          email: user.email
+        }
       });
-    } catch (ex) {
+
+    } catch (err) {
       return res.status(500).send({
-        'erro': ex
-      });
+            message: 'Falha ao processar sua requisição',
+            error: err
+        });
     }
   },
 
@@ -100,12 +105,18 @@ module.exports = {
       user.password = undefined;
 
       return res.status(201).send({
-        user,
-        token: await generateToken(user.id)
+        token: await generateToken(user.id),
+        user: {
+          name: user.name,
+          email: user.email
+        }
       });
 
     } catch (err) {
-      res.status(500).send(`erro: ${err}`);
+      return res.status(500).send({
+            message: 'Falha ao processar sua requisição',
+            error: err
+        });
     }
   }
 };

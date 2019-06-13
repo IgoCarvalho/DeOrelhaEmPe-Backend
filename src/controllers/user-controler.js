@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('../../config/properties');
 
 
 require('../models/user-model');
@@ -10,7 +9,7 @@ const UserModel = mongoose.model('User');
 const generateToken = (id) => {
   const token = jwt.sign({
     id: id
-  }, config.secretKey, {expiresIn: 25});
+  }, process.env.SECRET_KEY, {expiresIn: 25});
 
   return token;
 }

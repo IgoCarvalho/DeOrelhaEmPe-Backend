@@ -9,10 +9,13 @@ cloudinary.config({
 
 module.exports = async (req, res, next) => {
 	try {
-		let files = req.files
+		//console.log(req)
+		let files = Array.from(req.files)
+		console.log("XXXXX FOTOS XXXXX",req.files)
 		let filesData = []
 	
 		for(let file of files){
+			console.log(file)
 			const data = await cloudinary.uploader.upload(file.path)
 	
 			filesData.push({
@@ -25,12 +28,12 @@ module.exports = async (req, res, next) => {
 		}
 	
 		req.filesData = filesData
-		//console.log(req.filesData)
+		console.log(req.filesData)
 	
 		//const img = await cloudinary.uploader.upload(file);
 	
 	    next()
 	} catch(err){
-		res.status(500).send({err})
+		res.status(500).send({err, igo: 'uploadimages'})
 	}
 }

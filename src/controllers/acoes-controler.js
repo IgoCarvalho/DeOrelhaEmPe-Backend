@@ -1,48 +1,36 @@
 const mongoose = require('mongoose');
 
-require('../models/occuurrence-model');
-const OccurrenceModel = mongoose.model('Occurrence');
+require('../models/acao-model');
+const AcaoModel = mongoose.model('Acao');
 
-require('../models/complaint-model');
-const ComplaintModel = mongoose.model('Complaint');
 
 module.exports = {
   async create(req, res) {
     try {
-      const { title, description, geoData, street, number, neighborhood } = req.body
-      const category = JSON.parse(req.body.category)
-      // console.log(req.body)
-      console.log(req.filesData)
-      const newOccurrence = new OccurrenceModel({
-        user: req.userId,
-        title,
+      const { description } = req.body
+      console.log(req.body)
+      console.log(req.filesData[0])
+      console.log(req.files[0])
+      const newAcao = new AcaoModel({
         description,
-        category,
-        files: req.filesData,
-        address: {
-          street,
-          number,
-          neighborhood
-        },
-        geoData
+        image: req.filesData[0],
       })
 
-      const occ = await newOccurrence.save()
-      const oc = await OccurrenceModel.findById(occ._id).populate("user", "name email")
+      const ac = await newAcao.save()
 
-      req.io.emit('newOccurrence', oc)
-      //const occ = await OccurrenceModel.findById(oc.user)      
+      //req.io.emit('newOccurrence', occ)
+      
       return res.status(201).send({
-        occ
+        ac
       })
     } catch (error) {
       return res.status(500).send({ error })
     }
   },
-  async find(req, res) {
+  async findAll(req, res) {
     console.log(req.body)
-    const occ = await OccurrenceModel.find({}).sort('-updatedAt').populate("user", "name email")
-    return res.send({ occ })
+    const ac = await AcaoModel.find({}).sort('-updatedAt')
+    return res.send({ ac })
   },
   async findSmall(req, res) {
     console.log(req.body)
@@ -53,7 +41,7 @@ module.exports = {
     console.log(req.body)
     const status = JSON.parse(req.body.status)
     const { id, description } = req.body
-    const oc = await OccurrenceModel.findById(id).populate("user", "name")
+    const oc = await OccurrenceModel.findById(id)
     oc.timeLine.push({ status, description })
     oc.status = status
     // console.log(oc)
@@ -72,7 +60,7 @@ module.exports = {
     oc.coments.push({ user, text })
     // console.log(oc);
     const n = await oc.save()
-    console.log(req.io)
+    console.log(n)
 
     req.io.emit('newComent', n)
 

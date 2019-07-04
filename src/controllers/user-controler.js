@@ -9,7 +9,7 @@ const UserModel = mongoose.model('User');
 const generateToken = (id) => {
   const token = jwt.sign({
     id: id
-  }, process.env.SECRET_KEY, {expiresIn: 25});
+  }, process.env.SECRET_KEY, {expiresIn: '7d'});
 
   return token;
 }
@@ -74,10 +74,7 @@ module.exports = {
 
       return res.send({
         token: await generateToken(user.id),
-        user: {
-          name: user.name,
-          email: user.email
-        }
+        user
       });
 
     } catch (err) {
@@ -105,10 +102,7 @@ module.exports = {
 
       return res.status(201).send({
         token: await generateToken(user.id),
-        user: {
-          name: user.name,
-          email: user.email
-        }
+        user
       });
 
     } catch (err) {

@@ -6,6 +6,14 @@ const port = normalizePort(process.env.PORT || '3003');
 app.set('port', port);
 
 const server = http.createServer(app);
+const io = require('socket.io')(server)
+
+app.use((req, res, next)=>{
+  req.io = io
+  
+  next()
+})
+
 
 server.listen(port);
 server.on('error', onError);
